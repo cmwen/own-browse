@@ -57,17 +57,17 @@ See [AI_ANALYSIS.md](AI_ANALYSIS.md) for detailed examples.
 ## 🔧 Development
 
 ```bash
-# Start dev server (for UI development)
-npm run dev
-
-# View demo with mock data
-# Navigate to: http://localhost:5173/demo.html
-
-# Build for production
-npm run build
+# Build the extension
+pnpm run build
 
 # Type check
-npx tsc --noEmit
+pnpm exec tsc --noEmit
+
+# Load in Chrome
+# 1. Navigate to chrome://extensions/
+# 2. Enable Developer mode
+# 3. Click "Load unpacked"
+# 4. Select the dist/ folder
 ```
 
 ## 📚 Documentation
@@ -76,7 +76,7 @@ npx tsc --noEmit
 - [INSTALLATION.md](INSTALLATION.md) - Detailed setup
 - [DEVELOPMENT.md](DEVELOPMENT.md) - Development guide
 - [AI_ANALYSIS.md](AI_ANALYSIS.md) - AI integration guide
-- [CHANGELOG.md](CHANGELOG.md) - Version history
+- [AGENTS.md](AGENTS.md) - AI agent guide
 
 ## 🐛 Troubleshooting
 
@@ -91,9 +91,9 @@ npx tsc --noEmit
 - Ensure you have browsing history
 
 **Build fails:**
-- Delete `node_modules` and `package-lock.json`
-- Run `npm install` again
-- Ensure Node.js 16+ is installed
+- Delete `node_modules` and `pnpm-lock.yaml`
+- Run `pnpm install` again
+- Ensure Node.js 20+ is installed
 
 ## 🔒 Privacy
 
