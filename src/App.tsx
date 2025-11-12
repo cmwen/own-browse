@@ -13,6 +13,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [daysBack, setDaysBack] = useState(7);
+  const [selectedDomain, setSelectedDomain] = useState<string>('');
 
   useEffect(() => {
     loadHistoryData();
@@ -25,6 +26,7 @@ function App() {
       const history = await fetchHistory(daysBack);
       const processed = processHistoryData(history);
       setHistoryData(processed);
+      setSelectedDomain(''); // Reset domain filter on reload
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load history');
       console.error('Error loading history:', err);
@@ -43,6 +45,18 @@ function App() {
     if (!historyData) return;
     const csv = exportToCSV(historyData, 'days');
     downloadCSV(csv, `browsing-history-days-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
+  const handleExportDetailed = () => {
+    if (!historyData) return;
+    const csv = exportToCSV(historyData, 'detailed');
+    downloadCSV(csv, `browsing-history-detailed-${new Date().toISOString().split('T')[0]}.csv`);
+  };
+
+  const handleExportDomainDetail = (domain: string) => {
+    if (!historyData) return;
+    const csv = exportToCSV(historyData, 'domain-detail', domain);
+    downloadCSV(csv, `browsing-history-${domain.replace(/[^a-z0-9]/gi, '_')}-${new Date().toISOString().split('T')[0]}.csv`);
   };
 
   if (loading) {
@@ -129,15 +143,89 @@ function App() {
         </div>
       </div>
 
+      <div className="export-section">
+        <h2>📥 Export Options</h2>
+        <div className="export-buttons">
+          <button className="export-btn" onClick={handleExportDetailed}>
+            📊 Export Complete History (All Details)
+          </button>
+          <button className="export-btn" onClick={handleExportDomains}>
+            🌐 Export Top Domains Summary
+          </button>
+          <button className="export-btn" onClick={handleExportDays}>
+            📅 Export Weekly Activity
+          </button>
+        </div>
+      </div>
+
+      <div className="domain-filter-section">
+        <h2>🔍 Filter by Domain</h2>
+        <p className="hint">Select a domain to see detailed visits and export specific data (e.g., analyze your YouTube watch history)</p>
+        <select 
+          className="domain-select"
+          value={selectedDomain} 
+          onChange={(e) => setSelectedDomain(e.target.value)}
+        >
+          <option value="">-- Select a domain --</option>
+          {historyData.domainStats.map((stat) => (
+            <option key={stat.domain} value={stat.domain}>
+              {stat.domain} ({stat.visitCount} visits)
+            </option>
+          ))}
+        </select>
+
+        {selectedDomain && (
+          <div className="domain-details">
+            <h3>Details for: {selectedDomain}</h3>
+            {(() => {
+              const domainStat = historyData.domainStats.find(s => s.domain === selectedDomain);
+              if (!domainStat) return null;
+              
+              return (
+                <>
+                  <div className="domain-stats">
+                    <p><strong>Total Visits:</strong> {domainStat.visitCount}</p>
+                    <p><strong>Unique Pages:</strong> {domainStat.urls.length}</p>
+                    <p><strong>Est. Time Spent:</strong> {domainStat.timeSpent} minutes</p>
+                  </div>
+                  
+                  <div className="domain-urls">
+                    <h4>Recent Pages ({domainStat.urls.slice(0, 10).length} of {domainStat.urls.length})</h4>
+                    <ul>
+                      {domainStat.urls
+                        .sort((a, b) => (b.lastVisitTime || 0) - (a.lastVisitTime || 0))
+                        .slice(0, 10)
+                        .map((item, idx) => (
+                          <li key={idx}>
+                            <strong>{item.title || 'Untitled'}</strong>
+                            <br />
+                            <small>{item.url}</small>
+                            <br />
+                            <small>Visits: {item.visitCount || 0} • Last: {item.lastVisitTime ? new Date(item.lastVisitTime).toLocaleString() : 'Unknown'}</small>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+
+                  <button 
+                    className="export-btn domain-export" 
+                    onClick={() => handleExportDomainDetail(selectedDomain)}
+                  >
+                    📥 Export All {selectedDomain} History (CSV)
+                  </button>
+                </>
+              );
+            })()}
+          </div>
+        )}
+      </div>
+
       <div className="charts">
         <div className="chart-container">
           <h2>Top Domains by Visits</h2>
           <div className="chart-wrapper">
             <Pie data={domainChartData} options={{ maintainAspectRatio: true }} />
           </div>
-          <button className="export-btn" onClick={handleExportDomains}>
-            📥 Export Domains Data (CSV)
-          </button>
         </div>
 
         <div className="chart-container">
@@ -155,9 +243,6 @@ function App() {
               }} 
             />
           </div>
-          <button className="export-btn" onClick={handleExportDays}>
-            📥 Export Days Data (CSV)
-          </button>
         </div>
       </div>
 

@@ -4,11 +4,10 @@
   "description": "A browser extension that visualizes browsing history and allows data export",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build && npm run copy-manifest",
-    "copy-manifest": "cp public/manifest.json dist/ && cp public/*.png dist/",
-    "preview": "vite preview"
+    "build": "tsc && vite build && pnpm run copy-manifest",
+    "copy-manifest": "cp public/manifest.json dist/ && cp public/*.png dist/"
   },
+  "packageManager": "pnpm@9.0.0",
   "keywords": [],
   "author": "",
   "license": "ISC",

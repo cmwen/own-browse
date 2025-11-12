@@ -10,6 +10,7 @@ export interface DomainStats {
   domain: string;
   visitCount: number;
   timeSpent: number; // in minutes (estimated)
+  urls: HistoryItem[]; // Detailed history items for this domain
 }
 
 export interface DayOfWeekStats {
@@ -26,4 +27,5 @@ export interface ProcessedHistoryData {
     start: Date;
     end: Date;
   };
+  allHistory: HistoryItem[]; // Keep all history items for detailed export
 }

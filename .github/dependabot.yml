@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Enable version updates for npm (pnpm uses npm registry)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    groups:
+      # Group all non-security updates together
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group React dependencies
+      react:
+        patterns:
+          - "react*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group build tools
+      build-tools:
+        patterns:
+          - "vite"
+          - "typescript"
+          - "@vitejs/*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Allow both direct and indirect updates
+    versioning-strategy: increase
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5

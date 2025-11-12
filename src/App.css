@@ -171,3 +171,131 @@ button:hover {
   font-size: 0.9rem;
   opacity: 0.9;
 }
+
+.export-section {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.export-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: #667eea;
+}
+
+.export-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.domain-filter-section {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.domain-filter-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #667eea;
+}
+
+.domain-filter-section .hint {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.domain-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 2px solid #ddd;
+  font-size: 1rem;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.domain-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.domain-details {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.domain-details h3 {
+  color: #667eea;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.domain-details h4 {
+  color: #555;
+  margin-bottom: 10px;
+  margin-top: 15px;
+  font-size: 1rem;
+}
+
+.domain-stats {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.domain-stats p {
+  margin: 8px 0;
+  color: #444;
+}
+
+.domain-urls {
+  margin-bottom: 15px;
+}
+
+.domain-urls ul {
+  list-style: none;
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.domain-urls li {
+  background: white;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border-left: 3px solid #4A90E2;
+}
+
+.domain-urls li strong {
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.domain-urls li small {
+  color: #666;
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 3px;
+  word-break: break-all;
+}
+
+.domain-export {
+  margin-top: 15px;
+}

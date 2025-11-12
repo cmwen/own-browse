@@ -8,22 +8,20 @@ This guide is for developers who want to contribute to or modify the Own Browse 
 own-browse/
 ├── public/              # Static assets
 │   ├── manifest.json    # Extension manifest file
-│   ├── icon*.png        # Extension icons
-│   └── icon.svg         # Source SVG icon
+│   └── icon*.png        # Extension icons
 ├── src/                 # Source code
 │   ├── App.tsx          # Main React component
 │   ├── App.css          # Component styles
 │   ├── popup.tsx        # Extension popup entry point
-│   ├── demo.tsx         # Demo page with mock data
 │   ├── historyService.ts # Browser history API integration
 │   └── types.ts         # TypeScript type definitions
 ├── scripts/             # Build scripts
 │   └── generate-icons.js # Icon generation script
 ├── dist/                # Build output (generated)
 ├── popup.html           # Extension popup HTML
-├── demo.html            # Demo page HTML
 ├── vite.config.ts       # Vite configuration
 ├── tsconfig.json        # TypeScript configuration
+├── pnpm-workspace.yaml  # pnpm workspace configuration
 └── package.json         # Project dependencies
 ```
 
@@ -42,7 +40,7 @@ own-browse/
 
 1. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
 2. Generate icons (if needed):
@@ -52,27 +50,20 @@ node scripts/generate-icons.js
 
 ### Development Mode
 
-Start the Vite development server:
-```bash
-npm run dev
-```
+**Note**: This extension does not have a traditional dev server mode because it relies on the Chrome Extension API, which is only available when the extension is loaded in a browser.
 
-This starts a local server at `http://localhost:5173/`. However, note that the Chrome Extension API is only available when the extension is loaded in a browser, not in the dev server.
-
-### Testing with Mock Data
-
-To test the UI without loading the extension:
-```bash
-npm run dev
-```
-
-Then navigate to `http://localhost:5173/demo.html` to see the extension with mock data.
+To develop and test:
+1. Build the extension (see Building section)
+2. Load it in Chrome as an unpacked extension (see Loading in Browser section)
+3. Make code changes
+4. Run `pnpm run build` to rebuild
+5. Click the refresh icon in `chrome://extensions/` for your extension
 
 ### Building
 
-Build the production extension:
+Build the extension:
 ```bash
-npm run build
+pnpm run build
 ```
 
 This will:

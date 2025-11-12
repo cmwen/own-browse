@@ -42,7 +42,7 @@ export async function fetchHistory(daysBack: number = 7): Promise<HistoryItem[]>
  * Process history data to generate statistics
  */
 export function processHistoryData(historyItems: HistoryItem[]): ProcessedHistoryData {
-  const domainMap = new Map<string, { visitCount: number; timeSpent: number }>();
+  const domainMap = new Map<string, { visitCount: number; timeSpent: number; urls: HistoryItem[] }>();
   const dayMap = new Map<string, { visitCount: number; timeSpent: number }>();
   
   let minTime = Infinity;
@@ -64,9 +64,10 @@ export function processHistoryData(historyItems: HistoryItem[]): ProcessedHistor
     const estimatedTime = 1;
 
     // Update domain stats
-    const domainData = domainMap.get(domain) || { visitCount: 0, timeSpent: 0 };
+    const domainData = domainMap.get(domain) || { visitCount: 0, timeSpent: 0, urls: [] };
     domainData.visitCount += 1;
     domainData.timeSpent += estimatedTime;
+    domainData.urls.push(item);
     domainMap.set(domain, domainData);
 
     // Update day of week stats
@@ -81,7 +82,8 @@ export function processHistoryData(historyItems: HistoryItem[]): ProcessedHistor
     .map(([domain, stats]) => ({
       domain,
       visitCount: stats.visitCount,
-      timeSpent: stats.timeSpent
+      timeSpent: stats.timeSpent,
+      urls: stats.urls
     }))
     .sort((a, b) => b.visitCount - a.visitCount)
     .slice(0, 10); // Top 10 domains
@@ -103,27 +105,58 @@ export function processHistoryData(historyItems: HistoryItem[]): ProcessedHistor
     dateRange: {
       start: new Date(minTime === Infinity ? Date.now() : minTime),
       end: new Date(maxTime || Date.now())
-    }
+    },
+    allHistory: historyItems
   };
 }
 
 /**
  * Export data to CSV format
  */
-export function exportToCSV(data: ProcessedHistoryData, type: 'domains' | 'days'): string {
+export function exportToCSV(data: ProcessedHistoryData, type: 'domains' | 'days' | 'detailed' | 'domain-detail', domain?: string): string {
   if (type === 'domains') {
     const header = 'Domain,Visit Count,Time Spent (minutes)\n';
     const rows = data.domainStats
       .map(stat => `"${stat.domain}",${stat.visitCount},${stat.timeSpent}`)
       .join('\n');
     return header + rows;
-  } else {
+  } else if (type === 'days') {
     const header = 'Day of Week,Visit Count,Time Spent (minutes)\n';
     const rows = data.dayOfWeekStats
       .map(stat => `"${stat.day}",${stat.visitCount},${stat.timeSpent}`)
       .join('\n');
     return header + rows;
+  } else if (type === 'detailed') {
+    // Export all history with full details
+    const header = 'Title,URL,Domain,Visit Time,Visit Count,Typed Count\n';
+    const rows = data.allHistory
+      .map(item => {
+        const domain = extractDomain(item.url);
+        const title = (item.title || 'Untitled').replace(/"/g, '""');
+        const url = item.url.replace(/"/g, '""');
+        const visitTime = item.lastVisitTime ? new Date(item.lastVisitTime).toISOString() : '';
+        return `"${title}","${url}","${domain}","${visitTime}",${item.visitCount || 0},${item.typedCount || 0}`;
+      })
+      .join('\n');
+    return header + rows;
+  } else if (type === 'domain-detail' && domain) {
+    // Export detailed history for a specific domain
+    const domainStat = data.domainStats.find(stat => stat.domain === domain);
+    if (!domainStat) return '';
+    
+    const header = 'Title,URL,Visit Time,Visit Count,Typed Count\n';
+    const rows = domainStat.urls
+      .sort((a, b) => (b.lastVisitTime || 0) - (a.lastVisitTime || 0))
+      .map(item => {
+        const title = (item.title || 'Untitled').replace(/"/g, '""');
+        const url = item.url.replace(/"/g, '""');
+        const visitTime = item.lastVisitTime ? new Date(item.lastVisitTime).toISOString() : '';
+        return `"${title}","${url}","${visitTime}",${item.visitCount || 0},${item.typedCount || 0}`;
+      })
+      .join('\n');
+    return header + rows;
   }
+  return '';
 }
 
 /**
