@@ -5,7 +5,7 @@ const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'F
 /**
  * Extract domain from URL
  */
-function extractDomain(url: string): string {
+export function extractDomain(url: string): string {
   try {
     const urlObj = new URL(url);
     return urlObj.hostname;
@@ -19,7 +19,25 @@ function extractDomain(url: string): string {
  */
 export async function fetchHistory(daysBack: number = 7): Promise<HistoryItem[]> {
   const startTime = Date.now() - (daysBack * 24 * 60 * 60 * 1000);
-  
+
+  // Mock data for development/testing outside of extension environment
+  if (typeof chrome === 'undefined' || !chrome.history) {
+    console.warn('Chrome API not found, using mock data');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve([
+          { id: '1', url: 'https://www.google.com/search?q=react', title: 'React - Google Search', lastVisitTime: Date.now() - 100000, visitCount: 5, typedCount: 1 },
+          { id: '2', url: 'https://github.com/facebook/react', title: 'facebook/react: The library for web and native user interfaces', lastVisitTime: Date.now() - 200000, visitCount: 10, typedCount: 3 },
+          { id: '3', url: 'https://stackoverflow.com/questions/123/how-to-react', title: 'How to React? - Stack Overflow', lastVisitTime: Date.now() - 300000, visitCount: 2, typedCount: 0 },
+          { id: '4', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Rick Astley - Never Gonna Give You Up', lastVisitTime: Date.now() - 400000, visitCount: 20, typedCount: 0 },
+          { id: '5', url: 'https://news.ycombinator.com/', title: 'Hacker News', lastVisitTime: Date.now() - 500000, visitCount: 15, typedCount: 5 },
+          { id: '6', url: 'https://www.typescriptlang.org/docs/', title: 'Documentation - TypeScript', lastVisitTime: Date.now() - 600000, visitCount: 8, typedCount: 2 },
+          { id: '7', url: 'https://vitejs.dev/guide/', title: 'Getting Started | Vite', lastVisitTime: Date.now() - 700000, visitCount: 6, typedCount: 1 },
+        ]);
+      }, 500);
+    });
+  }
+
   return new Promise((resolve, reject) => {
     chrome.history.search(
       {
@@ -44,7 +62,7 @@ export async function fetchHistory(daysBack: number = 7): Promise<HistoryItem[]>
 export function processHistoryData(historyItems: HistoryItem[]): ProcessedHistoryData {
   const domainMap = new Map<string, { visitCount: number; timeSpent: number; urls: HistoryItem[] }>();
   const dayMap = new Map<string, { visitCount: number; timeSpent: number }>();
-  
+
   let minTime = Infinity;
   let maxTime = 0;
 
@@ -143,7 +161,7 @@ export function exportToCSV(data: ProcessedHistoryData, type: 'domains' | 'days'
     // Export detailed history for a specific domain
     const domainStat = data.domainStats.find(stat => stat.domain === domain);
     if (!domainStat) return '';
-    
+
     const header = 'Title,URL,Visit Time,Visit Count,Typed Count\n';
     const rows = domainStat.urls
       .sort((a, b) => (b.lastVisitTime || 0) - (a.lastVisitTime || 0))
@@ -166,7 +184,7 @@ export function downloadCSV(csvContent: string, filename: string): void {
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', filename);
   link.style.visibility = 'hidden';
